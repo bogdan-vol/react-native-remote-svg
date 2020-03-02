@@ -3,6 +3,7 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { SvgUri } from 'react-native-svg';
 
 const getHTML = (svgContent, style) => `
 <html data-key="key-${style.height}-${style.width}">
@@ -70,20 +71,25 @@ class SvgImage extends Component {
     if (svgContent) {
       const flattenedStyle = StyleSheet.flatten(props.style) || {};
       const html = getHTML(svgContent, flattenedStyle);
-
-      return (
-        <View pointerEvents="none" style={[props.style, props.containerStyle]}>
+      return props.useSvgUri && SvgUri ? (
+        <SvgUri
+          uri={this.props.source.uri}
+          {...(props.style.width ? { width: props.style.width } : {})}
+          {...(props.style.height ? { height: props.style.height } : {})}
+        />
+      ) : (
+        <View pointerEvents='none' style={[props.style, props.containerStyle]}>
           <WebView
             originWhitelist={['*']}
             scalesPageToFit={true}
-            useWebKit={false}
+            useWebKit={true}
             style={[
               {
                 width: 200,
                 height: 100,
-                backgroundColor: 'transparent',
+                backgroundColor: 'transparent'
               },
-              props.style,
+              props.style
             ]}
             scrollEnabled={false}
             showsHorizontalScrollIndicator={false}
@@ -95,7 +101,7 @@ class SvgImage extends Component {
     } else {
       return (
         <View
-          pointerEvents="none"
+          pointerEvents='none'
           style={[props.containerStyle, props.style]}
         />
       );
